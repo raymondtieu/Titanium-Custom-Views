@@ -90,14 +90,13 @@ function createCollapsibleTableView() {
 
 	view.collapse = function(index, rowData) {
 		//Ti.API.info("collapsing " + rowData.childRows.length + " rows at index " + index);
-		
-		for (var i = rowData.childRows.length; i > 0; i--) {
-			tableView.deleteRow(index + i);
+				
+		for (var i = 0; i < rowData.childRows.length; i++) {
+			tableView.deleteRow(index + 1);
 			
 			// refresh indices due to errors with Titanium TableViews
 			tableView.setData(tableView.data);
 		}
-		
 		if (rowData.childRows.length)
 			rowData.isExpanded = false;
 	};

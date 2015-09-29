@@ -3,7 +3,7 @@ var OFF = '';
 
 var radioSpec = {
 	title: OFF,
-	top: 5,
+	top: 7,
 	right: 15,
 	width: 25,
 	height: 25,
@@ -58,7 +58,8 @@ function createRadioButtonGroup(data) {
 		
 		// 1 option is always selected
 		if (selected == undefined) {
-			selected = this.id;
+			selected = data.id;
+			this.on(data.id);
 		}
 	};
 	

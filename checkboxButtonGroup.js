@@ -12,6 +12,8 @@ var checkboxSpec = {
 function createCheckboxButtonGroup(data) {
 	var data = data || {};
 	
+	var image = data.imagePath;
+	
 	var view = Ti.UI.createView({});
 	
 	// can't set values as a property of view...
@@ -88,7 +90,7 @@ function createCheckboxButtonGroup(data) {
 		
 		for (var i = 0; i < rows.length; i++) {
 			if (rows[i].id == id) {
-				rows[i].btn.backgroundImage = 'images/checkmark.png';
+				rows[i].btn.backgroundImage = image;
 				rows[i].btn.value = true;
 				
 				values[rows[i].id] = true;

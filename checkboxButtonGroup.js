@@ -1,8 +1,13 @@
 var checkboxSpec = {
-	top: 5,
-	right: 15,
-	width: 20,
+	/* Titanium background images are automatically stretched and the
+	 * first 3 proporties are dependent on the aspect ratio of the checkmark 
+	 * image used.
+	 */
+	top: 10,
+	width: 26,
 	height: 20,
+	
+	right: 15,
 	borderWidth: 0,
 	backgroundColor: 'transparent',
 	backgroundImage: 'none',

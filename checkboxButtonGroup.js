@@ -1,10 +1,10 @@
 var checkboxSpec = {
 	top: 5,
 	right: 15,
-	width: 40,
-	height: 40,
+	width: 20,
+	height: 20,
 	borderWidth: 0,
-	backgroundColor: "#fff",
+	backgroundColor: 'transparent',
 	backgroundImage: 'none',
 	value: false
 };
@@ -91,6 +91,7 @@ function createCheckboxButtonGroup(data) {
 		for (var i = 0; i < rows.length; i++) {
 			if (rows[i].id == id) {
 				rows[i].btn.backgroundImage = image;
+				
 				rows[i].btn.value = true;
 				
 				values[rows[i].id] = true;

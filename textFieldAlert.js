@@ -35,7 +35,6 @@ function createTextFieldAlert(data) {
 	
 	var textField = Ti.UI.createTextField({
 		top: '50%',
-		height: 'auto',
 		width: '85%',
 		borderStyle: Ti.UI.INPUT_BORDERSTYLE_ROUNDED,
 		font: {fontSize: 16},

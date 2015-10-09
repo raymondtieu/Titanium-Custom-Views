@@ -1,25 +1,7 @@
-var checkboxSpec = {
-	/* Titanium background images are automatically stretched and the
-	 * first 3 proporties are dependent on the aspect ratio of the checkmark 
-	 * image used.
-	 */
-	top: 10,
-	width: 26,
-	height: 20,
-	
-	right: 15,
-	borderWidth: 0,
-	backgroundColor: 'transparent',
-	backgroundImage: 'none',
-	value: false
-};
-
 function createCheckboxButtonGroup(data) {
 	var data = data || {};
 	
-	var image = data.imagePath;
-	
-	var view = Ti.UI.createView({});
+	var view = Ti.UI.createView();
 	
 	// can't set values as a property of view...
 	var values =  {};
@@ -35,26 +17,17 @@ function createCheckboxButtonGroup(data) {
 	view.insertOption = function(data) {		
 		var tableViewRow = Ti.UI.createTableViewRow({
 			id: data.id,
-		});
-		
-		var label = Ti.UI.createLabel({
-			text: data.text,
+			hasCheck: false,
+			
+			title: data.text,
 			color: '#000',
 			left: '5%',
 		});
 		
-		var btn = Ti.UI.createButton(checkboxSpec);
-		
-		tableViewRow.btn = btn;
-		
-		tableViewRow.add(label);
-		tableViewRow.add(btn);
-		
 		tableView.appendRow(tableViewRow);
 		
-		
-		if (data.value) {			
-			this.on(data.id);
+		if (data.value) {
+			tableViewRow.hasCheck = true;
 		}	
 		
 		values[data.id] = data.value;
@@ -65,7 +38,6 @@ function createCheckboxButtonGroup(data) {
 		
 		for (var i = 0; i < rows.length; i++) {
 			if (rows[i].id == id) {
-				rows[i].btn = null;
 				tableView.deleteRow(rows[i]);
 				
 				delete values[id];
@@ -90,40 +62,15 @@ function createCheckboxButtonGroup(data) {
 		return values[id];
 	};
 	
-	view.on = function(id) {
-		var rows = tableView.data[0].rows;
-		
-		for (var i = 0; i < rows.length; i++) {
-			if (rows[i].id == id) {
-				rows[i].btn.backgroundImage = image;
-				
-				rows[i].btn.value = true;
-				
-				values[rows[i].id] = true;
-			}
-		}
-	};
-	
-	view.off = function(id) {
-		var rows = tableView.data[0].rows;
-		
-		for (var i = 0; i < rows.length; i++) {
-			if (rows[i].id == id) {
-				rows[i].btn.backgroundImage = 'none';
-				rows[i].btn.value = false;
-				
-				values[rows[i].id] = false;
-			}	
-		}
-	};
-	
 	view.add(tableView);
 	
 	view.addEventListener('click', function(e) {
-		if (e.rowData.btn.value) {
-			view.off(e.rowData.id);
+		if (e.rowData.hasCheck) {
+			e.rowData.hasCheck = false;
+			values[e.rowData.id] = false;
 		} else {
-			view.on(e.rowData.id);
+			e.rowData.hasCheck = true;
+			values[e.rowData.id] = true;
 		}
 	});
 	

@@ -3,24 +3,23 @@ var OFF = '';
 
 var radioSpec = {
 	title: OFF,
-	top: 7,
 	right: 15,
-	width: 25,
-	height: 25,
+	width: 20,
+	height: 20,
 	borderColor: "#bbb",
 	borderWidth: 1,
-	borderRadius: 12,
+	borderRadius: 10,
 	backgroundColor: "#fff",
 	backgroundImage: 'none',
-	color: "#0053a6",
-	font: {fontSize: 40, fontWeight: "bold"},
+	color: "#007aff",
+	font: {fontSize: 30, fontWeight: "bold"},
 	value: false
 };
 
 function createRadioButtonGroup(data) {
 	var data = data || {};
 	
-	var view = Ti.UI.createView({});
+	var view = Ti.UI.createView();
 	
 	var selected;
 		

@@ -34,13 +34,20 @@ function createRadioButtonGroup(data) {
 	view.insertOption = function(data) {		
 		var tableViewRow = Ti.UI.createTableViewRow({
 			id: data.id,
+						
+			callback: data.callback,
 		});
 		
 		var label = Ti.UI.createLabel({
 			text: data.text,
 			color: '#000',
 			left: '5%',
+			color: data.color || '#000',
 		});
+		
+		if (data.font != null) {
+			label.font = data.font;
+		}
 		
 		var btn = Ti.UI.createButton(radioSpec);	
 		
@@ -119,6 +126,10 @@ function createRadioButtonGroup(data) {
 			view.off(e.rowData.id);
 		} else {
 			view.on(e.rowData.id);
+		}
+		
+		if (e.rowData.callback) {
+			e.rowData.callback(e.rowData.id, view.getValue(e.rowData.id));
 		}
 	});
 	

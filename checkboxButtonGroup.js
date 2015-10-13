@@ -13,6 +13,12 @@ function createCheckboxButtonGroup(data) {
 		rowHeight: 40,
 	});
 	
+	if (data.scrollable != null)
+		tableView.scrollable = data.scrollable;
+	
+	if (data.separatorColor != null)
+		tableView.separatorColor = data.separatorColor;
+	
 	/* View functions */
 	view.insertOption = function(data) {		
 		var tableViewRow = Ti.UI.createTableViewRow({
@@ -20,9 +26,15 @@ function createCheckboxButtonGroup(data) {
 			hasCheck: false,
 			
 			title: data.text,
-			color: '#000',
+			color: data.color || '#000',
 			left: '5%',
+			
+			callback: data.callback,
 		});
+		
+		if (data.font != null) {
+			tableViewRow.font = data.font;
+		}
 		
 		tableView.appendRow(tableViewRow);
 		
@@ -71,6 +83,10 @@ function createCheckboxButtonGroup(data) {
 		} else {
 			e.rowData.hasCheck = true;
 			values[e.rowData.id] = true;
+		}
+		
+		if (e.rowData.callback) {
+			e.rowData.callback(e.rowData.id, values[e.rowData.id]);
 		}
 	});
 	

@@ -67,6 +67,11 @@ function createTextFieldAlert(data) {
 	done.addEventListener('click', function() {
 		if (!textField.value.trim()) {
 			error.show();
+			
+			setTimeout(function() {
+				error.hide();
+			}, 5000);
+			
 			return;
 		}
 		
@@ -79,21 +84,21 @@ function createTextFieldAlert(data) {
 	
 	cancel.addEventListener('click', function() {
 		close();
-	});
+	});	
 	
 	/* Body Views */
 	var borderHorizontal = Ti.UI.createView({
-	    backgroundColor: '#a7a7a9',
-	    height: 1,
-	    left: 0,
-	    bottom: '25%'
+		backgroundColor: '#a7a7a9',
+		height: 1,
+		left: 0,
+		bottom: '25%'
 	});
 	
 	var borderVertical = Ti.UI.createView({
 		backgroundColor: '#a7a7a9',
-	    width: 1,
-	    left: '50%',
-	    top: '75%'
+		width: 1,
+		left: '50%',
+		top: '75%'
 	});
 	
 	wrapperView.add(title);

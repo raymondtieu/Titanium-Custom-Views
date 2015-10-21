@@ -30,6 +30,12 @@ function createRadioButtonGroup(data) {
 		rowHeight: 40,
 	});
 	
+	if (data.scrollable !== undefined)
+		tableView.scrollable = data.scrollable;
+	
+	if (data.separatorColor !== undefined)
+		tableView.separatorColor = data.separatorColor;
+	
 	/* View functions */
 	view.insertOption = function(data) {		
 		var tableViewRow = Ti.UI.createTableViewRow({
@@ -45,7 +51,7 @@ function createRadioButtonGroup(data) {
 			color: data.color || '#000',
 		});
 		
-		if (data.font != null) {
+		if (data.font !== undefined) {
 			label.font = data.font;
 		}
 		

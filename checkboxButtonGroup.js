@@ -13,10 +13,10 @@ function createCheckboxButtonGroup(data) {
 		rowHeight: 40,
 	});
 	
-	if (data.scrollable != null)
+	if (data.scrollable !== undefined)
 		tableView.scrollable = data.scrollable;
 	
-	if (data.separatorColor != null)
+	if (data.separatorColor !== undefined)
 		tableView.separatorColor = data.separatorColor;
 	
 	/* View functions */

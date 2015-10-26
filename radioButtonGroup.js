@@ -28,6 +28,7 @@ function createRadioButtonGroup(data) {
 		layout: 'vertical',
 		backgroundColor: 'transparent',
 		rowHeight: 40,
+		footerTitle: '',	// truncate table
 	});
 	
 	if (data.scrollable !== undefined)

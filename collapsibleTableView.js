@@ -43,6 +43,7 @@ function createCollapsibleTableView() {
 		
 		for (var i = 0; i < rows.length; i++) {
 			if (rows[i].isParent && rows[i].id == data.parentID) {
+				rows[i].hasChild = true;
 				rows[i].childRows = rows[i].childRows.concat(data);
 				
 				break;
@@ -74,10 +75,11 @@ function createCollapsibleTableView() {
 				setStyle(tableViewRow, data.style);
 			}
 			
-			tableView.insertRowAfter(index + i, tableViewRow);
+			tableView.insertRowAfter(index + i, tableViewRow, {animationStyle: Ti.UI.iPhone.RowAnimationStyle.DOWN});
 			
-			// refresh indices due to errors with Titanium TableViews
-			tableView.setData(tableView.data);
+			// refresh data if last row is clicked due to errors with Titanium TableViews
+			if (i == tableView.data[0].rowCount - 1)
+				tableView.setData(tableView.data);
 		}
 		
 		if (rowData.childRows.length) {
@@ -90,13 +92,15 @@ function createCollapsibleTableView() {
 
 	view.collapse = function(index, rowData) {
 		//Ti.API.info("collapsing " + rowData.childRows.length + " rows at index " + index);
-				
+		
 		for (var i = 0; i < rowData.childRows.length; i++) {
-			tableView.deleteRow(index + 1);
+			tableView.deleteRow(index + 1, {animationStyle: Ti.UI.iPhone.RowAnimationStyle.DOWN});
 			
-			// refresh indices due to errors with Titanium TableViews
-			tableView.setData(tableView.data);
+			// refresh data if last row is clicked due to errors with Titanium TableViews
+			if (i == tableView.data[0].rowCount - 1)
+				tableView.setData(tableView.data);
 		}
+		
 		if (rowData.childRows.length)
 			rowData.isExpanded = false;
 	};
@@ -114,9 +118,6 @@ function createCollapsibleTableView() {
 			}
 		}
 	});
-	
-	// TODO
-	//view.destroy;
 	
 	view.add(tableView);
 	

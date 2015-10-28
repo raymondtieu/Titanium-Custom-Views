@@ -1,14 +1,22 @@
 
-function createCollapsibleTableView() {
-	var view = Ti.UI.createView({
-	});
+function createCollapsibleTableView(args) {
+	var data = args || {};
+	
+	var view = Ti.UI.createView();
 	
 	var tableView = Ti.UI.createTableView({
 		height: Ti.UI.FILL,
 		layout: 'vertical',
 		backgroundColor: 'transparent',
 		rowHeight: 40,
+		footerTitle: '',	// truncate table
 	});
+	
+	if (data.scrollable !== undefined)
+		tableView.scrollable = data.scrollable;
+	
+	if (data.separatorColor !== undefined)
+		tableView.separatorColor = data.separatorColor;
 	
 	/* View methods */
 	view.insertParent = function(data) {
@@ -21,10 +29,13 @@ function createCollapsibleTableView() {
 			childRows: [],
 		});
 		
-		for (var i = 0; i < data.views.length; i++) {
-			tableViewRow.add(data.views[i]);
+		if (data.views !== undefined) {
+			for (var i = 0; i < data.views.length; i++)
+				tableViewRow.add(data.views[i]);
+			
+		} else if (data.title !== undefined) {
+			tableViewRow.title = data.title;
 		}
-		
 		
 		// set table view row style
 		if (data.style) {
@@ -66,8 +77,12 @@ function createCollapsibleTableView() {
 				callback: data.callback
 			});
 			
-			for (var j = 0; j < data.views.length; j++) {
-				tableViewRow.add(data.views[j]);
+			if (data.views !== undefined) {
+				for (var j in data.views)
+					tableViewRow.add(data.views[j]);
+				
+			} else if (data.title !== undefined) {
+				tableViewRow.title = data.title;
 			}
 			
 			// set table view row style
@@ -118,6 +133,19 @@ function createCollapsibleTableView() {
 			}
 		}
 	});
+	
+	if (data.inputGroup !== undefined) {
+		for (var i in data.inputGroup) {
+			var parent = data.inputGroup[i];
+			view.insertParent(parent);
+			
+			if (parent.children !== undefined) {
+				for (var j in parent.children) {
+					view.insertChild(parent.children[j]);
+				}
+			}
+		}
+	}
 	
 	view.add(tableView);
 	

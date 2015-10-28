@@ -1,5 +1,5 @@
-function createCheckboxButtonGroup(data) {
-	var data = data || {};
+function createCheckboxButtonGroup(args) {
+	var data = args || {};
 	
 	var view = Ti.UI.createView();
 	
@@ -78,6 +78,9 @@ function createCheckboxButtonGroup(data) {
 	view.add(tableView);
 	
 	view.addEventListener('click', function(e) {
+		if (data.clickDisabled)
+			return;
+		
 		if (e.rowData.hasCheck) {
 			e.rowData.hasCheck = false;
 			values[e.rowData.id] = false;

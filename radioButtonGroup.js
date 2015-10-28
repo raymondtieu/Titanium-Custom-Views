@@ -16,8 +16,8 @@ var radioSpec = {
 	value: false
 };
 
-function createRadioButtonGroup(data) {
-	var data = data || {};
+function createRadioButtonGroup(args) {
+	var data = args || {};
 	
 	var view = Ti.UI.createView();
 	
@@ -129,6 +129,9 @@ function createRadioButtonGroup(data) {
 	view.add(tableView);
 	
 	view.addEventListener('click', function(e) {
+		if (data.clickDisabled)
+			return;
+		
 		if (e.rowData.btn.value) {
 			view.off(e.rowData.id);
 		} else {

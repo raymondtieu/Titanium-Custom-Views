@@ -16,6 +16,14 @@ var radioSpec = {
 	value: false
 };
 
+var tableDefaults = {
+	height: Ti.UI.FILL,
+		layout: 'vertical',
+		backgroundColor: 'transparent',
+		rowHeight: 40,
+		footerTitle: '',	// truncate table
+};
+
 function createRadioButtonGroup(args) {
 	var data = args || {};
 	
@@ -23,25 +31,14 @@ function createRadioButtonGroup(args) {
 	
 	var selected;
 		
-	var tableView = Ti.UI.createTableView({
-		height: Ti.UI.FILL,
-		layout: 'vertical',
-		backgroundColor: 'transparent',
-		rowHeight: 40,
-		footerTitle: '',	// truncate table
-	});
+	var tableView = Ti.UI.createTableView(tableDefaults);
 	
-	if (data.scrollable !== undefined)
-		tableView.scrollable = data.scrollable;
-	
-	if (data.separatorColor !== undefined)
-		tableView.separatorColor = data.separatorColor;
+	setProperties(tableView, data);
 	
 	/* View functions */
 	view.insertOption = function(data) {		
 		var tableViewRow = Ti.UI.createTableViewRow({
 			id: data.id,
-						
 			callback: data.callback,
 		});
 		
@@ -49,12 +46,10 @@ function createRadioButtonGroup(args) {
 			text: data.text,
 			color: '#000',
 			left: '5%',
-			color: data.color || '#000',
+			color: '#000',
 		});
 		
-		if (data.font !== undefined) {
-			label.font = data.font;
-		}
+		setProperties(label, data);
 		
 		var btn = Ti.UI.createButton(radioSpec);	
 		
@@ -129,9 +124,6 @@ function createRadioButtonGroup(args) {
 	view.add(tableView);
 	
 	view.addEventListener('click', function(e) {
-		if (data.clickDisabled)
-			return;
-		
 		if (e.rowData.btn.value) {
 			view.off(e.rowData.id);
 		} else {
@@ -151,6 +143,11 @@ function createRadioButtonGroup(args) {
 	}
 	
 	return view;
+}
+
+function setProperties(view, options) {
+	for (var p in options)
+		view[p] = options[p];
 }
 
 exports.createRadioButtonGroup = createRadioButtonGroup;

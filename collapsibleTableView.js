@@ -1,22 +1,19 @@
 
+var tableDefaults = {
+	height: Ti.UI.FILL,
+	layout: 'vertical',
+	backgroundColor: 'transparent',
+	rowHeight: 40,
+	footerTitle: '',	// truncate table
+};
+
 function createCollapsibleTableView(args) {
 	var data = args || {};
 	
 	var view = Ti.UI.createView();
 	
-	var tableView = Ti.UI.createTableView({
-		height: Ti.UI.FILL,
-		layout: 'vertical',
-		backgroundColor: 'transparent',
-		rowHeight: 40,
-		footerTitle: '',	// truncate table
-	});
-	
-	if (data.scrollable !== undefined)
-		tableView.scrollable = data.scrollable;
-	
-	if (data.separatorColor !== undefined)
-		tableView.separatorColor = data.separatorColor;
+	var tableView = Ti.UI.createTableView(tableDefaults);
+	setProperties(tableView, data);
 	
 	/* View methods */
 	view.insertParent = function(data) {
@@ -39,7 +36,7 @@ function createCollapsibleTableView(args) {
 		
 		// set table view row style
 		if (data.style) {
-			setStyle(tableViewRow, data.style);
+			setProperties(tableViewRow, data.style);
 		}
 		
 		tableView.appendRow(tableViewRow);
@@ -87,7 +84,7 @@ function createCollapsibleTableView(args) {
 			
 			// set table view row style
 			if (data.style) {
-				setStyle(tableViewRow, data.style);
+				setProperties(tableViewRow, data.style);
 			}
 			
 			tableView.insertRowAfter(index + i, tableViewRow, {animationStyle: Ti.UI.iPhone.RowAnimationStyle.DOWN});
@@ -152,18 +149,9 @@ function createCollapsibleTableView(args) {
 	return view;
 }
 
-function setStyle(tableViewRow, style) {
-	if (style.backgroundColor)
-		tableViewRow.backgroundColor = style.backgroundColor;
-	
-	if (style.height)
-		tableViewRow.height = style.height;
-		
-	if (style.rightImage)
-		tableViewRow.rightImage = style.rightImage;
-		
-	if (style.leftImage)
-		tableViewRow.leftImage = style.leftImage;
+function setProperties(view, options) {
+	for (var p in options)
+		view[p] = options[p];
 }
 
 exports.createCollapsibleTableView = createCollapsibleTableView;

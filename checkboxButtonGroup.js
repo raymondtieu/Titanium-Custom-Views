@@ -1,3 +1,11 @@
+var tableDefaults = {
+	height: Ti.UI.FILL,
+	layout: 'vertical',
+	backgroundColor: 'transparent',
+	rowHeight: 40,
+	footerTitle: '',	// truncate table
+};
+
 function createCheckboxButtonGroup(args) {
 	var data = args || {};
 	
@@ -6,36 +14,21 @@ function createCheckboxButtonGroup(args) {
 	// can't set values as a property of view...
 	var values =  {};
 		
-	var tableView = Ti.UI.createTableView({
-		height: Ti.UI.FILL,
-		layout: 'vertical',
-		backgroundColor: 'transparent',
-		rowHeight: 40,
-		footerTitle: '',	// truncate table
-	});
+	var tableView = Ti.UI.createTableView(tableDefaults);
 	
-	if (data.scrollable !== undefined)
-		tableView.scrollable = data.scrollable;
-	
-	if (data.separatorColor !== undefined)
-		tableView.separatorColor = data.separatorColor;
+	setProperties(tableView, data);
 	
 	/* View functions */
 	view.insertOption = function(data) {		
 		var tableViewRow = Ti.UI.createTableViewRow({
 			id: data.id,
 			hasCheck: false,
-			
 			title: data.text,
-			color: data.color || '#000',
+			color: '#000',
 			left: '5%',
-			
-			callback: data.callback,
 		});
 		
-		if (data.font != null) {
-			tableViewRow.font = data.font;
-		}
+		setProperties(tableViewRow, data);
 		
 		tableView.appendRow(tableViewRow);
 		
@@ -78,9 +71,6 @@ function createCheckboxButtonGroup(args) {
 	view.add(tableView);
 	
 	view.addEventListener('click', function(e) {
-		if (data.clickDisabled)
-			return;
-		
 		if (e.rowData.hasCheck) {
 			e.rowData.hasCheck = false;
 			values[e.rowData.id] = false;
@@ -102,6 +92,11 @@ function createCheckboxButtonGroup(args) {
 	}
 	
 	return view;
+}
+
+function setProperties(view, options) {
+	for (var p in options)
+		view[p] = options[p];
 }
 
 exports.createCheckboxButtonGroup = createCheckboxButtonGroup;

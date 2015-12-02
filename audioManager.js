@@ -29,9 +29,6 @@ function getAudioManager(args) {
 	
 	Ti.Media.addEventListener('recordinginput', function(e) {
 		console.log('Input availability changed: '+e.available);
-		if (!e.available && recording.recording) {
-			b1.fireEvent('click', {});
-		}
 	});
 	
 	var file;

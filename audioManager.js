@@ -48,7 +48,7 @@ function getAudioManager(args) {
 		/**
 		 * Starts monitoring the microphone
 		 * @param {Object} args - arguments given to start recording
-		 * @param {function} args.callback - function that is called after start is run with recording status of device
+		 * @callback args.callback - function that is called after start is run with recording status of device
 		 */
 		start: function(args) {
 			Titanium.Media.audioSessionCategory = Ti.Media.AUDIO_SESSION_CATEGORY_RECORD;
@@ -84,11 +84,16 @@ function getAudioManager(args) {
 		/**
 		 * Stops monitoring the microphone and saves recording to the application data directory
 		 * @param {Object} args - arguments given to stop recording
-		 * @param {String} args.filename - filename of recording that will be be used when the recording is saved
-		 * @param {function} args.callback - function that is called after stop is run with recording status of device
+		 * @param {string} args.filename - filename of recording that will be be used when the recording is saved
+		 * @param {Boolean} args.overwrite - if true and there exists a file with the same name, it will be replaced with the new recording
+		 * @callback args.callback - function that is called after stop is run with recording status of device
 		 */
 		stop: function(args) {
 			var data = args || {};
+
+			var overwrite = false;
+			if (data.overwrite !== undefined)
+				overwrite = data.overwrite;
 			
 			if (recording.recording) {
 				file = recording.stop();
@@ -104,44 +109,47 @@ function getAudioManager(args) {
 				var r = Ti.Filesystem.getFile(Titanium.Filesystem.applicationDataDirectory, filename + ext);
 				
 				if (r.exists()) {
-					var alert = Titanium.UI.createAlertDialog({
-					    title: 'File Already Exists',
-					    message: 'A recording named “' + filename + '” already exists. Do you want to replace it with the one you’re saving?',
-					    buttonNames: ['Replace', 'Keep Both', 'Cancel'],
-					    cancel: 2
-					});
 					
-					alert.addEventListener('click', function(f) {
-						//Clicked cancel, first check is for iphone, second for android
-						if (f.cancel === f.index || f.cancel === true)
-							return;
-			
-						switch (f.index) {
-							case 0: 	// Replace
-								console.log("Overwrite recording: " + filename + ext);
-								r.deleteFile();
+					if (overwrite) {
+						console.log("Overwrite recording: " + filename + ext);
+						r.deleteFile();
+						
+					} else {
+						var alert = Titanium.UI.createAlertDialog({
+						    title: 'File Already Exists',
+						    message: 'A recording named “' + filename + '” already exists. Do you want to replace it with the one you’re saving?',
+						    buttonNames: ['Replace', 'Keep Both', 'Cancel'],
+						    cancel: 2
+						});
+						
+						alert.addEventListener('click', function(f) {
+							//Clicked cancel, first check is for iphone, second for android
+							if (f.cancel === f.index || f.cancel === true)
+								return;
+				
+							switch (f.index) {
+								case 0: 	// Replace
+									console.log("Overwrite recording: " + filename + ext);
+									r.deleteFile();
+									
+									break;
 								
-								r.write(file.toBlob);
-								break;
-							
-							case 1:		// Keep both
-								filename += findNextCopy(filename, ext);
-								console.log("Saving recording: " + filename + ext);
-								
-								r = Ti.Filesystem.getFile(Titanium.Filesystem.applicationDataDirectory, filename + ext);
-								
-								r.write(file.toBlob);
-								break;
-			 				default:
-			 					break;
-						}
-					});
-				 
-					alert.show();
-				} else {
-					console.log("Saving recording: " + filename + ext + " of size: " + file.size);
-					r.write(file.toBlob);
+								case 1:		// Keep both
+									filename += findNextCopy(filename, ext);
+									r = Ti.Filesystem.getFile(Titanium.Filesystem.applicationDataDirectory, filename + ext);
+									
+									break;
+				 				default:
+				 					break;
+							}
+						});
+					 
+						alert.show();
+					}
 				}
+
+				console.log("Saving recording: " + filename + ext + " of size: " + file.size);
+				r.write(file.toBlob);
 				
 				if (data.callback !== undefined)
 					data.callback({success: true, recording: filename, duration: duration});
@@ -158,7 +166,7 @@ function getAudioManager(args) {
 		/**
 		 * Pauses or resumes monitoring the microphone
 		 * @param {Object} args - arguments given to pause recording
-		 * @param {function} args.callback - function that is called after pause is run with recording status of device
+		 * @callback args.callback - function that is called after pause is run with recording status of device
 		 */
 		pause: function(args) {
 			var data = args || {};
@@ -195,10 +203,10 @@ function getAudioManager(args) {
 		/**
 		 * Starts playing back an audio file from the application data directory
 		 * @param {Object} args - arguments given to audio playback
-		 * @param {String} args.filename - filename of the audio file to be played
-		 * @param {function} args.playback - callback function when file has started playing
-		 * @param {function} args.complete - callback function when file has finished playing
-		 * @param {function} args.error - callback function when file could not be played
+		 * @param {string} args.filename - filename of the audio file to be played
+		 * @callback args.playback - callback function when file has started playing
+		 * @callback args.complete - callback function when file has finished playing
+		 * @callback args.error - callback function when file could not be played
 		 */
 		start: function(args) {
 			Titanium.Media.audioSessionCategory = Ti.Media.AUDIO_SESSION_CATEGORY_PLAYBACK;
@@ -241,7 +249,7 @@ function getAudioManager(args) {
 		/**
 		 * Stops playback any sound from device
 		 * @param {Object} args - arguments given to stop playback
-		 * @param {function} args.callback - callback function when stop is run with playback status of device
+		 * @callback args.callback - callback function when stop is run with playback status of device
 		 */
 		stop: function(args) {
 			var data = args || {};
@@ -262,7 +270,7 @@ function getAudioManager(args) {
 		/**
 		 * Pauses or resumes playback of the sound from device
 		 * @param {Object} args - arguments given to pause playback
-		 * @param {function} args.callback - callback function that is given the playback status
+		 * @callback args.callback - callback function that is given the playback status
 		 */
 		pause: function(args) {
 			var data = args || {};
@@ -290,10 +298,11 @@ function getAudioManager(args) {
 	/**
 	 * Renames a file in the application directory. File extension is .wav by default.
 	 * @param {Object} args - arguments given to rename a file
-	 * @param {String} args.filename - filename of the file to be renamed
-	 * @param {String} args.ext - file type of the file to be renamed
-	 * @param {String} args.new_filename - new filename
-	 * @param {function} args.callback - callback function given the status of the file rename operation
+	 * @param {string} args.filename - filename of the file to be renamed
+	 * @param {string} args.ext - file type of the file to be renamed
+	 * @param {string} args.new_filename - new filename
+	 * @param {Boolean} args.overwrite - if true and there exists a file with the same name, it will be replaced with the new recording	
+	 * @callback args.callback - callback function given the status of the file rename operation
 	 */
 	this.renameFile = function(args) {
 		var data = args || {};
@@ -304,10 +313,52 @@ function getAudioManager(args) {
 		var ext = data.ext || ".wav";
 		
 		var rename = false;
-		
+
+		var overwrite = false;
+		if (data.overwrite !== undefined)
+			overwrite = data.overwrite;
+
 		var r = Ti.Filesystem.getFile(Titanium.Filesystem.applicationDataDirectory, original + ext);
 		if (r.exists()) {
-			console.log("Renaming");
+
+			// Check if a file with the new file name already exists
+			var f = Ti.Filesystem.getFile(Titanium.Filesystem.applicationDataDirectory, new_name + ext);
+			if (f.exists()) {
+
+				if (overwrite) {
+					f.deleteFile();
+				} else {
+					var alert = Titanium.UI.createAlertDialog({
+					    title: 'File Already Exists',
+					    message: 'A recording named “' + filename + '” already exists. Do you want to replace it?',
+					    buttonNames: ['Replace', 'Keep Both', 'Cancel'],
+					    cancel: 2
+					});
+					
+					alert.addEventListener('click', function(e) {
+						//Clicked cancel, first check is for iphone, second for android
+						if (e.cancel === e.index || e.cancel === true)
+							return;
+			
+						switch (e.index) {
+							case 0: 	// Replace
+								console.log("Overwrite recording: " + new_name + ext);
+								f.deleteFile();
+								break;
+							
+							case 1:		// Keep both
+								new_name += findNextCopy(new_name, ext);
+								break;
+			 				default:
+			 					break;
+						}
+					});
+				 
+					alert.show();
+				}
+			}
+
+			console.log("Renaming " + original + " to " + new_name);
 			
 			rename = r.rename(new_name + ext);
 			
@@ -337,9 +388,9 @@ function getAudioManager(args) {
 	/**
 	 * Deletes a file in the application directory. File extension is .wav by default.
 	 * @param {Object} args - arguments given to delete a file
-	 * @param {String} args.filename - filename of the file to be deleted
-	 * @param {String} args.ext - file type of the file to be deleted
-	 * @param {function} args.callback - callback function given the status of the file delete operation
+	 * @param {string} args.filename - filename of the file to be deleted
+	 * @param {string} args.ext - file type of the file to be deleted
+	 * @callback args.callback - callback function given the status of the file delete operation
 	 */
 	this.deleteFile = function(args) {
 		var data = args || {};
@@ -386,7 +437,6 @@ function getAudioManager(args) {
 }
 
 exports.getAudioManager = getAudioManager;
-
 
 // Finds next available number to append when saving recordings of same name
 function findNextCopy(name, ext) {

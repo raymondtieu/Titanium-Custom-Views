@@ -1,5 +1,5 @@
 /* This helper file is used to make recording, pausing, playing and stopping
- * sound files easier.
+ * sound files easier using Titanium.
  * 
  * Files can also be renamed and deleted.
  */
@@ -8,7 +8,7 @@ function getAudioManager(args) {
 	
 	var ext = data.ext || '.wav';
 	
-	Titanium.Media.audioSessionMode = Ti.Media.AUDIO_SESSION_MODE_PLAY_AND_RECORD;
+	Titanium.Media.audioSessionCategory = Ti.Media.AUDIO_SESSION_MODE_PLAY_AND_RECORD;
 	var recording = Ti.Media.createAudioRecorder();
 	
 	// default compression is Ti.Media.AUDIO_FORMAT_LINEAR_PCM
@@ -43,6 +43,8 @@ function getAudioManager(args) {
 
 	this.record = {
 		start: function(args) {
+			Titanium.Media.audioSessionCategory = Ti.Media.AUDIO_SESSION_CATEGORY_RECORD;
+			
 			var data = args || {};
 			
 			var isRecording = false;
@@ -168,6 +170,8 @@ function getAudioManager(args) {
 
 	this.playback = {
 		start: function(args) {
+			Titanium.Media.audioSessionCategory = Ti.Media.AUDIO_SESSION_CATEGORY_PLAYBACK;
+			
 			var data = args || {};
 			
 			var r = Ti.Filesystem.getFile(Titanium.Filesystem.applicationDataDirectory, data.name + ext);

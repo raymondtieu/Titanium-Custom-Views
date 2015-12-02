@@ -1,14 +1,20 @@
-/* This helper file is used to make recording, pausing, playing and stopping
- * sound files easier using Titanium.
+/**
+ * This helper file is used to make recording, pausing, playing and stopping
+ * sound files easier using Appcelerator.
  * 
  * Files can also be renamed and deleted.
+ */
+
+/**
+ * Returns the audio manager with recording and playback functions
+ * @param {Object} args - arguments given to the audio manager
  */
 function getAudioManager(args) {
 	var data = args || {};
 	
-	var ext = data.ext || '.wav';
+	var ext = ".wav";
 	
-	Titanium.Media.audioSessionCategory = Ti.Media.AUDIO_SESSION_MODE_PLAY_AND_RECORD;
+	Titanium.Media.audioSessionCategory = Ti.Media.AUDIO_SESSION_CATEGORY_PLAY_AND_RECORD;
 	var recording = Ti.Media.createAudioRecorder();
 	
 	// default compression is Ti.Media.AUDIO_FORMAT_LINEAR_PCM
@@ -22,7 +28,7 @@ function getAudioManager(args) {
 	recording.format = Ti.Media.AUDIO_FILEFORMAT_WAVE;
 	
 	Ti.Media.addEventListener('recordinginput', function(e) {
-		Ti.API.info('Input availability changed: '+e.available);
+		console.log('Input availability changed: '+e.available);
 		if (!e.available && recording.recording) {
 			b1.fireEvent('click', {});
 		}
@@ -39,9 +45,14 @@ function getAudioManager(args) {
 		sound = null;
 		duration = 0;	
 	};
-		
 
 	this.record = {
+		
+		/**
+		 * Starts monitoring the microphone
+		 * @param {Object} args - arguments given to start recording
+		 * @param {function} args.callback - function that is called after start is run with recording status of device
+		 */
 		start: function(args) {
 			Titanium.Media.audioSessionCategory = Ti.Media.AUDIO_SESSION_CATEGORY_RECORD;
 			
@@ -55,11 +66,11 @@ function getAudioManager(args) {
 				
 				timer = setInterval(incrementDuration, 1000);
 				
-				Ti.API.info("Recording now...");
+				console.log("Recording now...");
 				
 				isRecording = true;
 			} else if (recording.recording) {
-				Ti.API.info("Already started recording.");
+				console.log("Already started recording.");
 				
 				isRecording = true;
 			} else {
@@ -73,6 +84,12 @@ function getAudioManager(args) {
 				data.callback({isRecording: isRecording});
 		},
 
+		/**
+		 * Stops monitoring the microphone and saves recording to the application data directory
+		 * @param {Object} args - arguments given to stop recording
+		 * @param {String} args.filename - filename of recording that will be be used when the recording is saved
+		 * @param {function} args.callback - function that is called after stop is run with recording status of device
+		 */
 		stop: function(args) {
 			var data = args || {};
 			
@@ -82,17 +99,17 @@ function getAudioManager(args) {
 				
 				clearInterval(timer);
 				
-				Ti.API.info("Stopped recording");
+				console.log("Stopped recording");
 				
 				var defaultName = 'Recording_' + (new Date()).toISOString().replace(/[^0-9\-:]/g, "_").slice(0, -5);	// remove miliseconds
-				var name = data.name || defaultName;
+				var filename = data.filename || defaultName;
 				
-				var r = Ti.Filesystem.getFile(Titanium.Filesystem.applicationDataDirectory, name + ext);
+				var r = Ti.Filesystem.getFile(Titanium.Filesystem.applicationDataDirectory, filename + ext);
 				
 				if (r.exists()) {
 					var alert = Titanium.UI.createAlertDialog({
 					    title: 'File Already Exists',
-					    message: 'A recording named “' + name + '” already exists. Do you want to replace it with the one you’re saving?',
+					    message: 'A recording named “' + filename + '” already exists. Do you want to replace it with the one you’re saving?',
 					    buttonNames: ['Replace', 'Keep Both', 'Cancel'],
 					    cancel: 2
 					});
@@ -104,17 +121,17 @@ function getAudioManager(args) {
 			
 						switch (f.index) {
 							case 0: 	// Replace
-								Ti.API.info("Overwrite recording: " + name + ext);
+								console.log("Overwrite recording: " + filename + ext);
 								r.deleteFile();
 								
 								r.write(file.toBlob);
 								break;
 							
 							case 1:		// Keep both
-								name += findNextCopy(name, ext);
-								Ti.API.info("Saving recording: " + name + ext);
+								filename += findNextCopy(filename, ext);
+								console.log("Saving recording: " + filename + ext);
 								
-								r = Ti.Filesystem.getFile(Titanium.Filesystem.applicationDataDirectory, name + ext);
+								r = Ti.Filesystem.getFile(Titanium.Filesystem.applicationDataDirectory, filename + ext);
 								
 								r.write(file.toBlob);
 								break;
@@ -125,22 +142,27 @@ function getAudioManager(args) {
 				 
 					alert.show();
 				} else {
-					Ti.API.info("Saving recording: " + name + ext + " of size: " + file.size);
+					console.log("Saving recording: " + filename + ext + " of size: " + file.size);
 					r.write(file.toBlob);
 				}
 				
 				if (data.callback !== undefined)
-					data.callback({success: true, recording: name, duration: duration});
+					data.callback({success: true, recording: filename, duration: duration});
 				
 				return;
 			} else {
-				Ti.API.info("Not recording anything.");
+				console.log("Not recording anything.");
 			}
 			
 			if (data.callback !== undefined)
 				data.callback({success: false});
 		},
 
+		/**
+		 * Pauses or resumes monitoring the microphone
+		 * @param {Object} args - arguments given to pause recording
+		 * @param {function} args.callback - function that is called after pause is run with recording status of device
+		 */
 		pause: function(args) {
 			var data = args || {};
 
@@ -148,12 +170,12 @@ function getAudioManager(args) {
 				return 0;
 			
 			if (recording.paused) {
-				Ti.API.info("Resuming...");
+				console.log("Resuming...");
 				recording.resume();
 				
 				timer = setInterval(incrementDuration, 1000);
 			} else {
-				Ti.API.info("Pausing...");
+				console.log("Pausing...");
 				recording.pause();
 				
 				clearInterval(timer);
@@ -163,24 +185,36 @@ function getAudioManager(args) {
 				data.callback({pause: recording.getPaused()});
 		},
 
+		/**
+		 * Returns duration of recording
+		 */
 		getDuration: function() {
 			return duration;
 		},
 	};
 
 	this.playback = {
+
+		/**
+		 * Starts playing back an audio file from the application data directory
+		 * @param {Object} args - arguments given to audio playback
+		 * @param {String} args.filename - filename of the audio file to be played
+		 * @param {function} args.playback - callback function when file has started playing
+		 * @param {function} args.complete - callback function when file has finished playing
+		 * @param {function} args.error - callback function when file could not be played
+		 */
 		start: function(args) {
 			Titanium.Media.audioSessionCategory = Ti.Media.AUDIO_SESSION_CATEGORY_PLAYBACK;
 			
 			var data = args || {};
 			
-			var r = Ti.Filesystem.getFile(Titanium.Filesystem.applicationDataDirectory, data.name + ext);
+			var r = Ti.Filesystem.getFile(Titanium.Filesystem.applicationDataDirectory, data.filename + ext);
 			
 			if (r.exists()) {
 				if (sound && sound.playing) {
-					Ti.API.info("Playback already started");
+					console.log("Playback already started");
 				} else {
-					Ti.API.info("starting playback");
+					console.log("starting playback");
 					
 					sound = Titanium.Media.createSound({url: r});
 					
@@ -195,7 +229,7 @@ function getAudioManager(args) {
 						data.playback({success: true});
 				}
 			} else {
-				var err = 'No file with name "' + data.name + '" was found.';
+				var err = 'No file with name "' + data.filename + '" was found.';
 				if (data.error !== undefined) {
 					data.error({error: err});
 				} else {
@@ -207,11 +241,16 @@ function getAudioManager(args) {
 			}
 		},
 
+		/**
+		 * Stops playback any sound from device
+		 * @param {Object} args - arguments given to stop playback
+		 * @param {function} args.callback - callback function when stop is run with playback status of device
+		 */
 		stop: function(args) {
 			var data = args || {};
 			
 			if (sound && sound.playing) {
-				Ti.API.info("Stopping playback");
+				console.log("Stopping playback");
 				sound.stop();
 				sound.release();
 				sound = null;
@@ -219,10 +258,15 @@ function getAudioManager(args) {
 				if (data.callback !== undefined)
 					data.callback({playback: false});
 			} else {
-				Ti.API.info("Nothing to stop");
+				console.log("Nothing to stop");
 			}
 		},
 
+		/**
+		 * Pauses or resumes playback of the sound from device
+		 * @param {Object} args - arguments given to pause playback
+		 * @param {function} args.callback - callback function that is given the playback status
+		 */
 		pause: function(args) {
 			var data = args || {};
 
@@ -232,10 +276,10 @@ function getAudioManager(args) {
 			var isPaused = false;
 			
 			if (sound.isPaused()) {
-				Ti.API.info("Resuming...");
+				console.log("Resuming...");
 				sound.play();
 			} else {
-				Ti.API.info("Pausing...");
+				console.log("Pausing...");
 				sound.pause();
 				
 				isPaused = true;
@@ -246,24 +290,34 @@ function getAudioManager(args) {
 		},
 	};
 	
+	/**
+	 * Renames a file in the application directory. File extension is .wav by default.
+	 * @param {Object} args - arguments given to rename a file
+	 * @param {String} args.filename - filename of the file to be renamed
+	 * @param {String} args.ext - file type of the file to be renamed
+	 * @param {String} args.new_filename - new filename
+	 * @param {function} args.callback - callback function given the status of the file rename operation
+	 */
 	this.renameFile = function(args) {
 		var data = args || {};
 		
-		var original = data.original;
-		var new_name = data.new_name;
+		var original = data.filename;
+		var new_name = data.new_filename;
+
+		var ext = data.ext || ".wav";
 		
 		var rename = false;
 		
 		var r = Ti.Filesystem.getFile(Titanium.Filesystem.applicationDataDirectory, original + ext);
 		if (r.exists()) {
-			Ti.API.info("Renaming");
+			console.log("Renaming");
 			
 			rename = r.rename(new_name + ext);
 			
 			if (rename) {
-				Ti.API.info("Renaming successful");
+				console.log("Renaming successful");
     		} else {
-    			Ti.API.info("Renaming failed");
+    			console.log("Renaming failed");
     		}	      
     		
     		if (data.callback !== undefined) {       		
@@ -283,21 +337,30 @@ function getAudioManager(args) {
 		}		
 	};
 	
+	/**
+	 * Deletes a file in the application directory. File extension is .wav by default.
+	 * @param {Object} args - arguments given to delete a file
+	 * @param {String} args.filename - filename of the file to be deleted
+	 * @param {String} args.ext - file type of the file to be deleted
+	 * @param {function} args.callback - callback function given the status of the file delete operation
+	 */
 	this.deleteFile = function(args) {
 		var data = args || {};
+
+		var ext = data.ext || ".wav";
 		
-		if (data.name) {
-			var r = Ti.Filesystem.getFile(Titanium.Filesystem.applicationDataDirectory, data.name + ext);
+		if (data.filename) {
+			var r = Ti.Filesystem.getFile(Titanium.Filesystem.applicationDataDirectory, data.filename + ext);
 			
 			if (r.exists()) {
-				Ti.API.info("Deleting");
+				console.log("Deleting " + data.filename);
 				var result = r.deleteFile();
 				
 				if (data.callback !== undefined)
 					data.callback({success: result});
 				
 			} else {
-				var err = 'No file with name "' + data.name + '" was found.';
+				var err = 'No file with name "' + data.filename + '" was found.';
 				
 				if (data.callback !== undefined) {
 					data.callback({success: false, error: err});
@@ -334,7 +397,7 @@ function findNextCopy(name, ext) {
     var dir = Titanium.Filesystem.getFile(appDir);
     var dir_files = dir.getDirectoryListing();
     
-    Ti.API.info("dir_files: " + dir_files);
+    console.log("dir_files: " + dir_files);
     
     var k = 2;
 
@@ -353,7 +416,7 @@ function findNextCopy(name, ext) {
 	    	// match the number of the suffix;
 	    	var suffixNum = /[\(\)]/g;
 	    	
-	    	Ti.API.info("MATCHED: " + fname);
+	    	console.log("MATCHED: " + fname);
 	    	
 	    	var n = 0;
 	    	

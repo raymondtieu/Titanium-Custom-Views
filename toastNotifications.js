@@ -5,13 +5,13 @@ function createToast(args) {
 		padding: 15,
 		paddingSides: 25,
 		color: 'white',
-		backgroundColor: '#666666',
+		backgroundColor: "#99000000",
 		borderRadius: 25,
 		
 		height: Ti.UI.SIZE,
 		width: Ti.UI.SIZE,
 		maxWidth: '90%',
-		bottom: 75,
+		bottom: "10%",
 		
 		textAlign: 'center',
 	};
@@ -26,6 +26,7 @@ function createToast(args) {
 		width: style.maxWidth,
 		bottom: style.bottom,
 		touchEnabled: false,
+		statusBarStyle: Ti.UI.iPhone.StatusBar.OPAQUE_BLACK,
 	});
 	
 	var msgView = Ti.UI.createView({
@@ -50,6 +51,10 @@ function createToast(args) {
 		textAlign: style.textAlign,
 		
 		text: (data.text ? data.text.trim() : 'This is a toast message.'),
+		
+		font: {
+			fontSize: 14,
+		}
 	});
 	
 	msgView.add(msgLabel);

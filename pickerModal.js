@@ -16,31 +16,29 @@ function createPickerModal(args) {
 	});
 	
 	var done = Ti.UI.createButton({
-		title: L("done"),
-		top: 4,
-		right: "12%"
+		systemButton: Ti.UI.iPhone.SystemButton.DONE
 	});
 	
 	var cancel = Ti.UI.createButton({
-		title: L("cancel"),
-		top: 4,
-		left: "12%",
+		systemButton: Ti.UI.iPhone.SystemButton.CANCEL
 	});
+	
+	var flexSpace = Ti.UI.createButton({
+		systemButton: Ti.UI.iPhone.SystemButton.FLEXIBLE_SPACE
+	});
+	
+	var toolbar =  Titanium.UI.iOS.createToolbar({
+	    items:[cancel, flexSpace, done],
+	    top: 50, // Border doesn't appear with top: 0
+	    borderTop: true,
+	    borderBottom: false,
+	    height: Ti.UI.SIZE
+	}); 
 	
 	var wrapper = Ti.UI.createView({
-		height: 265,
-		backgroundColor: "f9f9f9",
+		height: Ti.UI.SIZE,
 		bottom: 0,
-		bubbleParent: false,
-	});
-	
-	var divider = Ti.UI.createView({
-		height: 37,
-		top: 0,
-		width: "120%",
-		borderWidth: 1,
-		borderColor: "b2b2b2",
-		//backgroundColor: "b2b2b2",
+		layout: "vertical"
 	});
 	
 	var picker = Ti.UI.createPicker({
@@ -51,9 +49,7 @@ function createPickerModal(args) {
 	
 	picker.value = data.date || new Date();
 	
-	divider.add(done);
-	divider.add(cancel);
-	wrapper.add(divider);
+	wrapper.add(toolbar);
 	wrapper.add(picker);
 	win.add(wrapper);
 	

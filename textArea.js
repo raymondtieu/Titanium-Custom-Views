@@ -1,10 +1,25 @@
 /* 
  * Titanium TextArea with hintText property for iOS 
+ * Default keyboard toolbar with done button
  */
 function createTextArea(args) {
 	var data = args || {};
 	
 	var textArea = Ti.UI.createTextArea();
+	
+	var done = Ti.UI.createButton({
+		systemButton: Ti.UI.iPhone.SystemButton.DONE
+	});
+	
+	var flexSpace = Ti.UI.createButton({
+		systemButton: Ti.UI.iPhone.SystemButton.FLEXIBLE_SPACE
+	});
+	
+	done.addEventListener("click", function() {
+		textArea.blur();
+	});
+	
+	textArea.keyboardToolbar = [flexSpace, done];
 	
 	setProperties(textArea, data);
 	
